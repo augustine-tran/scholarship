@@ -6,6 +6,7 @@ vn.demand.scholarship.KidForm = Ext.extend(Ext.form.FormPanel, {
     frame: true,
     labelWidth: 80,
     url: null,
+	store: null,
 	plugins: ['msgbus'],
     
     constructor: function(config){
@@ -102,16 +103,17 @@ vn.demand.scholarship.KidForm = Ext.extend(Ext.form.FormPanel, {
      */
     ,
     submit: function(){
-        this.getForm().submit({
-            url: this.url,
-            scope: this,
-            success: this.onSuccess,
-            failure: this.onFailure,
-            params: {
-                format: 'json'
-            },
-            waitMsg: 'Saving...'
-        });		
+        var values = this.getForm().getValues();
+		console.log(values)
+		var s = new Date();
+		this.store.addKid({
+			kidId: Kid.nextId(), 
+			name: values.name, 
+			place_of_birth: values.place_of_birth, 
+			code: values.code, 
+			birth: s.add('d', 21), 
+			address: values.address
+		});
     } // eo function submit
     /**
      * Success handler

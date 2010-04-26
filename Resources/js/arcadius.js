@@ -34,7 +34,8 @@ Ext.onReady(function(){
                             width: 500,
                             height: 350,
                             items: [{
-                                xtype: 'KidForm'
+                                xtype: 'KidForm',
+								store: kidStore
                             }]
                         }).show();
                         
