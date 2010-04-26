@@ -1,0 +1,18 @@
+.x-slider-horz .x-slider-bg {
+	background-position:center bottom;
+}
+.x-slider-horz, .x-slider-horz .x-slider-end, .x-slider-horz .x-slider-inner, .x-slider-horz .x-slider-bg {
+	background-image:url(../images/fillslider-bg.png);
+}
+
+.x-slider-vert .x-slider-bg {
+	bottom:0;
+	position:absolute;
+	background-position:right center;
+	
+	/* For IE */
+	line-height:0;
+}
+.x-slider-vert, .x-slider-vert .x-slider-end, .x-slider-vert .x-slider-inner, .x-slider-vert .x-slider-bg {
+	background-image:url(../images/fillslider-v-bg.png);
+}
