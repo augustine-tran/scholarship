@@ -7,82 +7,30 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
     ,keepSelection: true,
     actions: [
 	{
-        qtipIndex: 'Edit',
-        iconCls: 'icon-edit-report'
+        qtipIndex: _('Edit'),
+        iconCls: 'icon-edit-kid'
     }, {
-        qtipIndex: 'Delete',
-        iconCls: 'icon-delete-report'
+        qtipIndex: _('New Sponsor'),
+        iconCls: 'icon-new-sponsor'
     }
 	],
     callbacks: {
-		'icon-edit-report': function(grid, record, action, row, col){
+		'icon-edit-kid': function(grid, record, action, row, col){
 			// TODO: use Ext.Action to prevent duplicate these code and JobOrderTab.js 
 			new Ext.Window({
-                title: 'Edit report',
+                title: 'Edit kid',
 				iconCls: 'icon-edit-report',
                 modal: true,
                 layout: 'fit',
                 width: 600,
                 height: 450,
                 items: {
-					reportTypeId: record.get('report_type_id'),
-					reportId: record.get('report_id'),
-                    xtype: 'edit_report_form'
+					kid: record,
+                    xtype: 'KidForm'
                 }
             }).show();
 		}, 
-		'icon-delete-report': function(grid, record, action, row, col){
-			// TODO: use Ext.Action to prevent duplicate these code and JobOrderTab.js 
-			Ext.Msg.confirm('Delete report', "Do you want to delete this report ['"+record.get('report_name')+"']?", function(btn) {
-				var reportId = record.get('report_id'),
-					report_name = record.get('report_name')
-				if (btn == 'yes') {
-					Ext.Ajax.request({
-						scope: this,
-	                    url: App.data.report_delete,
-	                    params: {
-	                        report_id: reportId
-	                    }
-						,
-	                    success: function(res){
-	                        var result = Ext.util.JSON.decode(res.responseText)
-							App.publish('vn.demand.scholarships.delete_report', {success: result.success, report_id: reportId})
-							
-	                        new Ext.ux.window.MessageWindow({
-	                            title: 'Report has been deleted',
-								help: false,
-	                            autoDestroy: true,//default = true
-	                            autoHeight: true,
-	                            autoHide: true,//default = true
-	                            bodyStyle: 'text-align:center; ',
-								padding: 10,
-	                            closable: true,
-	                            html: 'Report [' + reportName + '] has been deleted',
-	                            iconCls: result.success ? 'icon-ok' : 'icon-error',
-	                            width: 250 //optional (can also set minWidth which = 200 by default)
-	                        }).show(Ext.getDoc());
-	                    },
-	                    failure: function(){
-	                        new Ext.ux.window.MessageWindow({
-	                            title: 'Report deleting failed',
-								help: false,
-	                            autoDestroy: true,//default = true
-	                            autoHeight: true,
-	                            autoHide: true,//default = true
-	                            bodyStyle: 'text-align:center; ',
-								padding: 10,
-	                            closable: true,
-	                            html: 'Report [' + reportName + '] deleting failed',
-	                            iconCls: 'icon-error',
-	                            width: 250 //optional (can also set minWidth which = 200 by default)
-	                        }).show(Ext.getDoc());
-	                        
-	                    }
-	                });
-	//							this.get(0).getForm().loadRecord(this.reportInfo)
-	//							this.get(1).doRestore();
-				}
-			}, grid)
+		'icon-new-sponsor': function(grid, record, action, row, col){
 		}
 	}
 });
@@ -97,18 +45,22 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
         var config = {
             // store
             store: App.data.kidStore,
-            plugins: ['msgbus'],//Ext.ux.PanelCollapsedTitle
+            plugins: ['msgbus',vn.demand.scholarship.KidGrid_action],//Ext.ux.PanelCollapsedTitle
             columns: [{
                 dataIndex: 'code',
                 header: _('Code')
             }, {
                 dataIndex: 'name',
                 header: _('Name')
-            }]
+            }, vn.demand.scholarship.KidGrid_action]
             ,
             viewConfig: {
                 forceFit: true
             } // tooltip template
+            ,tbar: [{
+				text: _('New Kid') ,
+				iconCls: 'icon-new-kid'
+			}]
             ,
             bbar: new Ext.PagingToolbar({ // paging bar on the bottom
                 pageSize: 20,
@@ -120,7 +72,6 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
         }; // eo config object
         // apply config
         Ext.apply(this, Ext.apply(this.initialConfig, config));
-        console.log('go =============================== go')
         // call parent
         vn.demand.scholarship.KidGrid.superclass.initComponent.apply(this, arguments);
         

@@ -94,6 +94,9 @@ vn.demand.scholarship.KidForm = Ext.extend(Ext.form.FormPanel, {
         this.getForm().waitMsgTarget = this.getEl();
         
         // loads form after initial layout
+		if (this.kid) {
+			this.getForm().loadRecord(this.kid);			
+		}
         // this.on('afterlayout', this.onLoadClick, this, {single:true});
     
     } // eo function onRender
@@ -104,16 +107,24 @@ vn.demand.scholarship.KidForm = Ext.extend(Ext.form.FormPanel, {
     ,
     submit: function(){
         var values = this.getForm().getValues();
-		console.log(values)
-		var s = new Date();
-		this.store.addKid({
-			kidId: Kid.nextId(), 
-			name: values.name, 
-			place_of_birth: values.place_of_birth, 
-			code: values.code, 
-			birth: s.add('d', 21), 
-			address: values.address
-		});
+		if (this.kid) {
+			this.kid.set('name', values.name) 
+			this.kid.set('code', values.code) 
+			this.kid.set('place_of_birth', values.place_of_birth) 
+			this.kid.set('address', values.address) 
+			App.data.kidStore.loadData([this.kid], true)
+		} else {
+			var s = new Date();
+			this.store.addKid({
+				kidId: Kid.nextId(), 
+				name: values.name, 
+				place_of_birth: values.place_of_birth, 
+				code: values.code, 
+				birth: s.add('d', 21), 
+				address: values.address
+			});
+		}
+		
     } // eo function submit
     /**
      * Success handler

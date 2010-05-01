@@ -58,10 +58,13 @@
 .icon-add-field {
 	background-image:url(../images/crystal/icons/plus.png) ! important;
 }
-.icon-new-report {
+.icon-new-sponsor {
 	background-image:url(../images/crystal/icons/add_report.png) ! important;
 }
-.icon-edit-report {
+.icon-new-kid {
+	background-image:url(../images/crystal/icons/add_report.png) ! important;
+}
+.icon-edit-kid {
 	background-image:url(../images/crystal/icons/edit_report.png) ! important;
 }
 .icon-del-field {
