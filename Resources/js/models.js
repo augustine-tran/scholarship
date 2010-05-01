@@ -11,7 +11,7 @@ Kid = Ext.data.Record.create([
     {name: 'code', type:'string'},
     {name: 'birth', type:'date', dateFormat: 'Y-m-d H:i:s'},
     {name: 'place_of_birth', type:'string'}
-]);
+], 'kidId');
 
 Kid.nextId = function(){
 	// if the time isn't unique enough, the addition 
