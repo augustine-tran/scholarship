@@ -3,15 +3,26 @@ Ext.BLANK_IMAGE_URL = 'ext/resources/images/default/s.gif';
 function _(key, label) {
 	return label ? label:key;
 }
+try {
 
 Ext.onReady(function(){
 	var conn = Ext.data.SqlDB.getInstance();
-	conn.open('kids.db');
-    // the main grid store
-    var kidStore = new KidStore(conn);
+	conn.open('scholarship.sql');
 	
-	kidStore.load();
-	loadDemoKids(kidStore)
+	// create Kid table
+	// TODO: refactor to function
+	conn.createTable({
+        name: 'kid',
+        key: 'kidId',
+        fields: Kid.prototype.fields
+    });
+	
+	
+    // the main grid store
+    App.data.kidStore = new KidStore(conn);
+	
+	App.data.kidStore.load();
+	loadDemoKids(App.data.kidStore)
 	
     var vp = new Ext.Viewport({
         layout: "border",
@@ -35,7 +46,7 @@ Ext.onReady(function(){
                             height: 350,
                             items: [{
                                 xtype: 'KidForm',
-								store: kidStore
+								store: App.data.kidStore
                             }]
                         }).show();
                         
@@ -75,10 +86,22 @@ Ext.onReady(function(){
                         
                     }
                 }, {
+					text: 'Test load store',
+					handler: function() {
+						Titanium.API.debug('==========before re-load =================' + App.data.kidStore.getCount());
+						App.data.kidStore.load();
+						Titanium.API.debug('==========after re-load =================' + App.data.kidStore.getCount());
+												
+						var records = App.data.kidStore.getRange();
+						Ext.each(records,function(r) {
+							console.log(r.get('name'));
+						})	
+					}
+				}, {
 						text: 'Test Titanium db',
 						handler: function() {
 							try {
-								kidStore.addKid({
+								App.data.kidStore.addKid({
 				                    kidId: Kid.nextId(),
 				                    name: 'cu Bo',
 				                    birth: '1983-02-09 00:00:00',
@@ -86,12 +109,14 @@ Ext.onReady(function(){
 				                });
 								var rows = conn.query('select * from kid');
 								Titanium.API.debug('===============================');
-								for(var i = 0; i < rows.rowCount(); i++) {
-									Titanium.API.debug(rows.field(1));
-									rows.next();
+								for(var i = 0; i < rows.length; i++) {
+									var r = rows[i]
+									Titanium.API.debug(r['name']);
 								}
 								Titanium.API.debug('===============================');
 								return true;
+								
+								
 								var db = Titanium.Database.openFile("data.sql");
 								db.execute('create table my (name varchar(100))');
 								db.execute("insert into my values ('Khanh Beo')");
@@ -123,7 +148,12 @@ Ext.onReady(function(){
             
             }] // eo Toolbar area
         }, {
-            region: "center"
+            region: "center",
+			title: _('List of Kids'),
+			layout: 'fit',
+			items: [{
+				xtype: 'KidGrid'
+			}]
         }, {
             region: "west",
             title: "Groups",
@@ -140,6 +170,7 @@ Ext.onReady(function(){
 function loadDemoKids(store){
 	var s = new Date();
 	// hardcoded demo kids
+	/*
 	store.addKid({kidId: Kid.nextId(), name:'Start documentation of Ext 2.0', place_of_birth:'Ext', code:'', birth: s.add('d', 21), address: ''});
 	store.addKid({kidId: Kid.nextId(), name:'Release Ext 1.l Beta 2', place_of_birth:'Ext', code:'', birth:s.add('d', 2), address: ''});
 	store.addKid({kidId: Kid.nextId(), name:'Take wife to see movie', place_of_birth:'Family', code:'', birth:s.add('d', 2), address: ''});
@@ -147,5 +178,17 @@ function loadDemoKids(store){
 	store.addKid({kidId: Kid.nextId(), name:'Do something other than work', place_of_birth:'Family', code:'', birth:s.add('d', -1), address: ''});
 	store.addKid({kidId: Kid.nextId(), name:'Go to the grocery store', place_of_birth:'Family', code:'', birth:s.add('d', -1), address: ''});
 	store.addKid({kidId: Kid.nextId(), name:'Reboot my computer', place_of_birth:'Misc', code:'', birth:s, address: ''});
+	*/
 	store.addKid({kidId: Kid.nextId(), name:'Respond to emails', place_of_birth:'Ext', code:'', birth:s, address: ''});
+
+	var records = store.getRange();
+	Ext.each(records,function(r) {
+		console.log(r.get('name'));
+	})	
+}
+
+} catch (e) {
+	console.log('====================ERROR=====================')
+	console.log(e)
+	console.log('====================END=====================')
 }

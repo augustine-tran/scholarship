@@ -27,9 +27,6 @@ Kid.nextId = function(){
 // The main grid's store
 KidStore = function(conn){
 	KidStore.superclass.constructor.call(this, {
-        sortInfo:{field: 'name', direction: "ASC"},
-        groupField:'name',
-        kidFilter: 'all',
         reader: new Ext.data.JsonReader({
             idProperty: 'kidId'
         }, Kid)
@@ -38,37 +35,14 @@ KidStore = function(conn){
     this.proxy = new Ext.data.SqlDB.Proxy(conn, 'kid', 'kidId', this);
 
     if(true){ // google needs the table created
-        this.proxy.on('beforeload', this.prepareTable, conn);
+        //this.proxy.on('beforeload', this.prepareTable, conn);
     }
 
-    this.addEvents({newcategory: true});
 };
 
-Ext.extend(KidStore, Ext.data.GroupingStore, {
-    applyFilter : function(filter){
-    	if(filter !== undefined){
-    		this.kidFilter = filter;
-    	}
-        var value = this.kidFilter;
-        if(value == 'all'){
-            return this.clearFilter();
-        }
-        return this.filterBy(function(item){
-            return item.data.completed === value;
-        });
-    },
-
+Ext.extend(KidStore, Ext.data.Store, {
     addKid : function(data){
-        this.suspendEvents();
-        this.clearFilter();
-        this.resumeEvents();
         this.loadData([data], true);
-        this.suspendEvents();
-        this.applyFilter();
-        this.applyGrouping(true);
-        this.resumeEvents();
-        this.fireEvent('datachanged', this);
-        this.fireEvent('newcategory', data.category);
     },
 
     prepareTable : function(){
