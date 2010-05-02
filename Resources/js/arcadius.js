@@ -7,7 +7,7 @@ try {
 
 Ext.onReady(function(){
 	var conn = Ext.data.SqlDB.getInstance();
-	conn.open('scholarship.sql');
+	conn.open('d:/scholarship.sql');
 	
 	// create Kid table
 	// TODO: refactor to function
@@ -16,13 +16,27 @@ Ext.onReady(function(){
         key: 'kidId',
         fields: Kid.prototype.fields
     });
+	conn.createTable({
+        name: 'sponsor',
+        key: 'sponsorId',
+        fields: Sponsor.prototype.fields
+    });
+	conn.createTable({
+        name: 'payment',
+        key: 'paymentId',
+        fields: Payment.prototype.fields
+    });
 	
 	
     // the main grid store
     App.data.kidStore = new KidStore(conn);
+	App.data.sponsorStore = new SponsorStore(conn);
+	App.data.paymentStore = new PaymentStore(conn);
 	
 	App.data.kidStore.load();
-	loadDemoKids(App.data.kidStore)
+	App.data.sponsorStore.load();
+	App.data.paymentStore.load();
+	//loadDemoKids(App.data.kidStore)
 	
     var vp = new Ext.Viewport({
         layout: "border",
@@ -60,8 +74,8 @@ Ext.onReady(function(){
                             iconCls: 'icon-prefs',
                             modal: true,
                             layout: 'fit',
-                            width: 500,
-                            height: 350,
+                            width: 650,
+                            height: 400,
                             items: [{
                                 xtype: 'SponsorForm'
                             }]

@@ -31,6 +31,18 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
             }).show();
 		}, 
 		'icon-new-sponsor': function(grid, record, action, row, col){
+			new Ext.Window({
+                title: 'New sponsor for ' + record.get('name'),
+				iconCls: 'icon-new-sponsor',
+                modal: true,
+                layout: 'fit',
+                width: 600,
+                height: 450,
+                items: {
+					kid: record,
+                    xtype: 'SponsorForm'
+                }
+            }).show();
 		}
 	}
 });

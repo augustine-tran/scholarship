@@ -112,7 +112,7 @@ vn.demand.scholarship.KidForm = Ext.extend(Ext.form.FormPanel, {
 			this.kid.set('code', values.code) 
 			this.kid.set('place_of_birth', values.place_of_birth) 
 			this.kid.set('address', values.address) 
-			App.data.kidStore.loadData([this.kid], true)
+			App.data.kidStore.loadData([this.kid])
 		} else {
 			var s = new Date();
 			this.store.addKid({

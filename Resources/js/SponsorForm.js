@@ -1,6 +1,11 @@
 Ext.ns('vn.demand.scholarship');
 
 vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
+	// data
+	kid: null,
+	sponsor: null,
+	sponsorPayment: null,
+	
     // defaults - can be changed from outside
     border: false,
     frame: true,
@@ -38,10 +43,32 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
             autoScroll: true, // ,buttonAlign:'right'
             labelAlign: 'top',
             labelWidth: 120,
-            items: [{
+			layout: "tableform",
+			layoutConfig: {
+			     columns: 2,
+			     columnWidths: [0.5,0.5]
+			}  
+            ,items: [{
 				name: 'name',
                 fieldLabel: _('Name'),
-				allowBlank: false
+				allowBlank: false,
+				xtype: 'combo',
+				store: App.data.sponsorStore,
+				mode: 'local',
+				displayField: 'name',
+				valueField: 'sponsorId',
+				typeAhead: true,
+		        forceSelection: false,
+		        triggerAction: 'all',
+		        emptyText:'Select a sponsor or type new one...',
+		        selectOnFocus:true,
+				listeners: {
+					'select': function(cb, record, index) {
+						this.sponsor = record
+						this.getForm().loadRecord(record)
+					},
+					scope: this
+				}
             }, {
 				name: 'title',
                 fieldLabel: _('Title')
@@ -52,11 +79,33 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
 				name: 'email',
 				fieldLabel: _('Email'),
 				vtype: 'email'
+			}, {
+				name: 'date_start',
+                fieldLabel: _('Date start'),
+				xtype: 'datefield'
             }, {
+				name: 'date_end',
+                fieldLabel: _('Date end'),
+				xtype: 'datefield'
+            }, {
+				name: 'amount',
+				fieldLabel: _('***Amount***'),
+				value: 900000,
+				allowBlank: false
+            }, {
+				name: 'date_in',
+                fieldLabel: _('Date in'),
+				xtype: 'datefield'
+            }, {
+				name: 'extra_support',
+				fieldLabel: _('Extra support'),
+            }, {
+				name: 'note',
+				fieldLabel: _('Note')
+			}, {
 				name: 'address',
 				fieldLabel: _('Address'),
-				xtype: 'textarea',
-				height: 50
+				colspan: 2
 			}],
             buttons: [{
                 text: 'Submit',
@@ -99,16 +148,56 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
      */
     ,
     submit: function(){
-        this.getForm().submit({
-            url: this.url,
-            scope: this,
-            success: this.onSuccess,
-            failure: this.onFailure,
-            params: {
-                format: 'json'
-            },
-            waitMsg: 'Saving...'
-        });		
+		var values = this.getForm().getValues();
+		try {
+			if (this.sponsor == null) {
+				this.sponsor = {};
+				this.sponsor.sponsorId = Sponsor.nextId();
+				this.sponsor.name= values.name; 
+				this.sponsor.address= values.address; 
+				this.sponsor.phone= values.phone;
+				this.sponsor.email= values.email;
+				this.sponsor.title= values.title;
+				App.data.sponsorStore.addSponsor(this.sponsor)
+				this.sponsor = App.data.sponsorStore.getById(this.sponsor.sponsorId)
+			} else {
+				this.sponsor.set('name', values.name);
+				this.sponsor.set('title', values.title);
+				this.sponsor.set('email', values.email);
+				this.sponsor.set('address', values.address);
+				this.sponsor.set('phone', values.phone);
+				this.sponsor.set('note', values.note);
+				App.data.sponsorStore.loadData([this.sponsor], false)
+			}
+			
+			this.payment = {
+				paymentId: Payment.nextId(), 
+				sponsorId: this.sponsor.id,
+				kidId: this.kid.get('kidId'),
+				amount: values.amount,
+				extra_support: values.extra_support,
+				note: values.note,
+				date_start: null,
+				date_end: null,
+				date_in: null
+			}
+			var s = this.getForm().findField('date_start').getValue();
+			if (s && Ext.isDate(s)) {
+				this.payment.date_start = s.format('Y-m-d H:i:s');
+			}
+			s = this.getForm().findField('date_end').getValue();
+			if (s && Ext.isDate(s)) {
+				this.payment.date_end = s.format('Y-m-d H:i:s');
+			}
+			s = this.getForm().findField('date_in').getValue();
+			if (s && Ext.isDate(s)) {
+				this.payment.date_in = s.format('Y-m-d H:i:s');
+			}
+	        App.data.paymentStore.addPayment(this.payment)
+		} catch (e) {
+			console.log(e);
+			Ext.Msg.alert(e)
+		}
     } // eo function submit
     /**
      * Success handler

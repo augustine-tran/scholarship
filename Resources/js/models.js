@@ -56,6 +56,114 @@ Ext.extend(KidStore, Ext.data.Store, {
     }
 });
 
+Sponsor = Ext.data.Record.create([
+    {name: 'sponsorId', type:'string'},
+    {name: 'name', type:'string'},
+    {name: 'address', type:'string'},
+    {name: 'title', type:'string'},
+    {name: 'phone', type:'string'},
+    {name: 'email', type:'string'},
+    {name: 'note', type:'string'},
+], 'sponsorId');
+
+Sponsor.nextId = function(){
+	// if the time isn't unique enough, the addition 
+	// of random chars should be
+	var t = String(new Date().getTime()).substr(4);
+	var s = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	for(var i = 0; i < 4; i++){
+		t += s.charAt(Math.floor(Math.random()*26));
+	}
+	return t;
+}
+
+// The main grid's store
+SponsorStore = function(conn){
+	SponsorStore.superclass.constructor.call(this, {
+        reader: new Ext.data.JsonReader({
+            idProperty: 'sponsorId'
+        }, Sponsor)
+    });
+
+    this.proxy = new Ext.data.SqlDB.Proxy(conn, 'sponsor', 'sponsorId', this);
+
+    if(true){ // google needs the table created
+        //this.proxy.on('beforeload', this.prepareTable, conn);
+    }
+
+};
+
+Ext.extend(SponsorStore, Ext.data.Store, {
+    addSponsor : function(data){
+        this.loadData([data], true);
+    },
+
+    prepareTable : function(){
+        try{
+	        this.createTable({
+	            name: 'sponsor',
+	            key: 'sponsorId',
+	            fields: Sponsor.prototype.fields
+	        });
+        }catch(e){console.log(e)}
+    }
+});
+
+Payment = Ext.data.Record.create([
+    {name: 'paymentId', type:'string'},
+    {name: 'kidId', type:'string'},
+    {name: 'sponsorId', type:'string'},
+    {name: 'extra_support', type:'string'},
+    {name: 'amount', type:'integer'},
+    {name: 'date_start', type:'date', dateFormat: 'Y-m-d H:i:s'},
+    {name: 'date_end', type:'date', dateFormat: 'Y-m-d H:i:s'},
+    {name: 'date_in', type:'date', dateFormat: 'Y-m-d H:i:s'}
+], 'paymentId');
+
+Payment.nextId = function(){
+	// if the time isn't unique enough, the addition 
+	// of random chars should be
+	var t = String(new Date().getTime()).substr(4);
+	var s = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	for(var i = 0; i < 4; i++){
+		t += s.charAt(Math.floor(Math.random()*26));
+	}
+	return t;
+}
+
+// The main grid's store
+PaymentStore = function(conn){
+	PaymentStore.superclass.constructor.call(this, {
+        reader: new Ext.data.JsonReader({
+            idProperty: 'paymentId'
+        }, Payment)
+    });
+
+    this.proxy = new Ext.data.SqlDB.Proxy(conn, 'payment', 'paymentId', this);
+
+    if(true){ // google needs the table created
+        //this.proxy.on('beforeload', this.prepareTable, conn);
+    }
+
+};
+
+Ext.extend(PaymentStore, Ext.data.Store, {
+    addPayment : function(data){
+        this.loadData([data], true);
+    },
+
+    prepareTable : function(){
+        try{
+	        this.createTable({
+	            name: 'payment',
+	            key: 'paymentId',
+	            fields: Payment.prototype.fields
+	        });
+        }catch(e){console.log(e)}
+    }
+});
+
+
 // The store for Categories
 CategoryStore = function(){
     CategoryStore.superclass.constructor.call(this, {
