@@ -66,8 +66,13 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
 					'select': function(cb, record, index) {
 						this.sponsor = record
 						this.getForm().loadRecord(record)
-					},
-					scope: this
+					}
+					,'change': function(cb, newValue, oldValue) {
+						if (this.sponsor && newValue != oldValue) {
+							this.sponsor = null;
+						}
+					}
+					,scope: this
 				}
             }, {
 				name: 'title',

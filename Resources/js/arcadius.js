@@ -7,7 +7,7 @@ try {
 
 Ext.onReady(function(){
 	var conn = Ext.data.SqlDB.getInstance();
-	conn.open(Titanium.App.appURLToPath("app://scholarship.sql"));
+	conn.open(Titanium.Filesystem.getApplicationDataDirectory().nativePath() + Titanium.Filesystem.getSeparator() + 'scholarship.sql');
 	
 	// create Kid table
 	// TODO: refactor to function
