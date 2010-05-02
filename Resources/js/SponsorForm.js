@@ -169,6 +169,7 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
 				this.sponsor.set('note', values.note);
 				App.data.sponsorStore.loadData([this.sponsor], false)
 			}
+			App.data.sponsorStore.load();
 			
 			this.payment = {
 				paymentId: Payment.nextId(), 

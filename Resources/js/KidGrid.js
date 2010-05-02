@@ -71,7 +71,21 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
             } // tooltip template
             ,tbar: [{
 				text: _('New Kid') ,
-				iconCls: 'icon-new-kid'
+				iconCls: 'icon-new-kid',
+				handler: function() {
+					new Ext.Window({
+                        title: 'New a Kid',
+                        iconCls: 'icon-prefs',
+                        modal: true,
+                        layout: 'fit',
+                        width: 500,
+                        height: 350,
+                        items: [{
+                            xtype: 'KidForm',
+							store: App.data.kidStore
+                        }]
+                    }).show();
+				}
 			}]
             ,
             bbar: new Ext.PagingToolbar({ // paging bar on the bottom

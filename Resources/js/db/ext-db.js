@@ -56,7 +56,6 @@ Ext.extend(Ext.data.SqlDB, Ext.util.Observable, {
 		    scope = o.scope,
             buf = [],
             types = Ext.data.Types;
-        console.log('table name: ' + tableName)    
 		if(!(fs instanceof Array)){ // Ext fields collection
 			fs = fs.items;
 		}
@@ -189,7 +188,6 @@ Ext.data.SqlDB.Proxy = function(conn, table, keyName, store){
 
 Ext.extend(Ext.data.SqlDB.Proxy, Ext.data.DataProxy, {
     load : function(params, reader, callback, scope, arg){
-		console.log('=-=================Proxy load: ======================')
     	if(!this.conn.isOpen()){ // assume that the connection is in the process of opening
     		this.conn.on('open', function(){
     			this.load(params, reader, callback, scope, arg);
@@ -216,11 +214,9 @@ Ext.extend(Ext.data.SqlDB.Proxy, Ext.data.DataProxy, {
         }else{
             callback.call(scope||this, null, arg, false);
         }
-		console.log('=-=================end Proxy load: ======================')
     },
 
     onLoad : function(trans, rs, e, stmt){
-		console.log('======onload=============')
         if(rs === false){
     		this.fireEvent("loadexception", this, null, trans.arg, e);
             trans.callback.call(trans.scope||window, null, trans.arg, false);
@@ -228,10 +224,8 @@ Ext.extend(Ext.data.SqlDB.Proxy, Ext.data.DataProxy, {
     	}
     	var result = trans.reader.readRecords(rs);
 		result.totalRecords = 2;
-		console.log(result)
         this.fireEvent("load", this, rs, trans.arg);
         trans.callback.call(trans.scope||window, result, trans.arg, true);
-		console.log('======end onload===================')
     },
 
     processData : function(o){
