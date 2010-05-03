@@ -208,7 +208,8 @@ Ext.extend(Ext.data.SqlDB.Proxy, Ext.data.DataProxy, {
 				}
 				clause += sort + ' ' + (dir || 'ASC');
 			}
-
+			console.log("=====" + clause)
+			console.log(params)
 			this.table.selectBy(clause, args,
 					this.onLoad.createDelegate(this, [{callback:callback, scope:scope, arg:arg, reader: reader}], 0));
         }else{

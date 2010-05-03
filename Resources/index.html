@@ -11,6 +11,7 @@
         <script type="text/javascript" src="ext/ux/MsgBus.js"></script>
         <script type="text/javascript" src="ext/ux/TableForm.js"></script>
         <script type="text/javascript" src="ext/ux/RowActions.js"></script>
+        <script type="text/javascript" src="ext/ux/RowPanelExpander.js"></script>
 		
         <script type="text/javascript" src="js/db/ext-db.js"></script>
         <script type="text/javascript" src="js/db/ext-titanium-db.js"></script>
@@ -18,13 +19,17 @@
         <script type="text/javascript" src="js/arcadius.js"></script>
         <script type="text/javascript" src="js/KidGrid.js"></script>
         <script type="text/javascript" src="js/KidForm.js"></script>
+        <script type="text/javascript" src="js/SponsorGrid.js"></script>
         <script type="text/javascript" src="js/SponsorForm.js"></script>
+        <script type="text/javascript" src="js/PaymentGrid.js"></script>
         <script type="text/javascript" src="js/PaymentForm.js"></script>
 		
         <script type="text/javascript">
         	var App = window.App || {};
 
 			App.data = {};
+			
+			App.data.conn = null;
 			
 			App.data.kidStore = null;
 			App.data.sponsorStore = null;

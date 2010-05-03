@@ -6,22 +6,22 @@ function _(key, label) {
 try {
 
 Ext.onReady(function(){
-	var conn = Ext.data.SqlDB.getInstance();
-	conn.open(Titanium.Filesystem.getApplicationDataDirectory().nativePath() + Titanium.Filesystem.getSeparator() + 'scholarship.sql');
+	App.data.conn = Ext.data.SqlDB.getInstance(); 
+	App.data.conn.open(Titanium.Filesystem.getApplicationDataDirectory().nativePath() + Titanium.Filesystem.getSeparator() + 'scholarship.sql');
 	
 	// create Kid table
 	// TODO: refactor to function
-	conn.createTable({
+	App.data.conn.createTable({
         name: 'kid',
         key: 'kidId',
         fields: Kid.prototype.fields
     });
-	conn.createTable({
+	App.data.conn.createTable({
         name: 'sponsor',
         key: 'sponsorId',
         fields: Sponsor.prototype.fields
     });
-	conn.createTable({
+	App.data.conn.createTable({
         name: 'payment',
         key: 'paymentId',
         fields: Payment.prototype.fields
@@ -29,9 +29,9 @@ Ext.onReady(function(){
 	
 	
     // the main grid store
-    App.data.kidStore = new KidStore(conn);
-	App.data.sponsorStore = new SponsorStore(conn);
-	App.data.paymentStore = new PaymentStore(conn);
+    App.data.kidStore = new KidStore(App.data.conn);
+	App.data.sponsorStore = new SponsorStore(App.data.conn);
+	App.data.paymentStore = new PaymentStore(App.data.conn);
 	
 	App.data.kidStore.load();
 	App.data.sponsorStore.load();
@@ -48,115 +48,11 @@ Ext.onReady(function(){
             items: [{
                 xtype: "toolbar",
                 items: [{
-                    text: 'New a Kid',
-					iconCls: 'icon-prefs',
-                    handler: function(){
-                        new Ext.Window({
-                            title: 'New a Kid',
-                            iconCls: 'icon-prefs',
-                            modal: true,
-                            layout: 'fit',
-                            width: 500,
-                            height: 350,
-                            items: [{
-                                xtype: 'KidForm',
-								store: App.data.kidStore
-                            }]
-                        }).show();
-                        
-                    }
-                }, {
-                    text: 'New Sponsor',
-					iconCls: 'icon-prefs',
-                    handler: function(){
-                        new Ext.Window({
-                            title: 'New a Sponsor',
-                            iconCls: 'icon-prefs',
-                            modal: true,
-                            layout: 'fit',
-                            width: 650,
-                            height: 400,
-                            items: [{
-                                xtype: 'SponsorForm'
-                            }]
-                        }).show();
-                        
-                    }
-                }, {
-                    text: 'New Payment',
-					iconCls: 'icon-prefs',
-                    handler: function(){
-                        new Ext.Window({
-                            title: 'New a Sponsor',
-                            iconCls: 'icon-prefs',
-                            modal: true,
-                            layout: 'fit',
-                            width: 500,
-                            height: 350,
-                            items: [{
-                                xtype: 'PaymentForm'
-                            }]
-                        }).show();
-                        
-                    }
-                }, {
-					text: 'Test load store',
-					handler: function() {
-						Titanium.API.debug('==========before re-load =================' + App.data.kidStore.getCount());
-						App.data.kidStore.load();
-						Titanium.API.debug('==========after re-load =================' + App.data.kidStore.getCount());
-												
-						var records = App.data.kidStore.getRange();
-						Ext.each(records,function(r) {
-							console.log(r.get('name'));
-						})	
-					}
-				}, {
-						text: 'Test Titanium db',
+						text: 'Export to PDF',
+						iconCls: 'icon-pdf',
 						handler: function() {
-							try {
-								App.data.kidStore.addKid({
-				                    kidId: Kid.nextId(),
-				                    name: 'cu Bo',
-				                    birth: '1983-02-09 00:00:00',
-				                    code: 'Lam Van Ben'
-				                });
-								var rows = conn.query('select * from kid');
-								Titanium.API.debug('===============================');
-								for(var i = 0; i < rows.length; i++) {
-									var r = rows[i]
-									Titanium.API.debug(r['name']);
-								}
-								Titanium.API.debug('===============================');
-								return true;
-								
-								
-								var db = Titanium.Database.openFile("data.sql");
-								db.execute('create table my (name varchar(100))');
-								db.execute("insert into my values ('Khanh Beo')");
-								db.execute("insert into my values ('Khanh khai map')");
-								var rows = db.execute('select * from my');
-								Titanium.API.debug(rows.fieldByName('name'));
-								rows.next();
-								Titanium.API.debug(rows.fieldByName('name'));
-								db.close();
-								
-								var db = new Ext.data.TitaniumDB();
-								db.open('data.sql', function() {
-									console.log('connection open')
-								}, this)
-								
-								db.exec("insert into my values ('Khanh Beo')");
-								db.exec("insert into my values ('Khanh khai map')");
-								
-								var rows = db.query('select * from my');
-								Ext.Msg.alert('', rows.fieldByName('name'));
-								rows.next();
-								Ext.Msg.alert('', rows.fieldByName('name'));
-							} catch (e) {
-								Ext.Msg.alert(e)
-								Titanium.API.debug(e);
-							}
+							Ext.Msg.alert('Not yet finish')
+							return true;
 						}
 					}] //eo Toolbar
             
@@ -170,7 +66,8 @@ Ext.onReady(function(){
 			}]
         }, {
             region: "west",
-            title: "Groups",
+            title: "Sponsors",
+			xtype: "SponsorGrid",
             width: 250,
             collapsible: true
         }]

@@ -1,15 +1,6 @@
 Ext.ns('vn.demand.scholarship');
 
-var expander = new Ext.ux.grid.RowPanelExpander({
-	createExpandingRowPanelItems: function(record, rowIndex){
-		return {
-			xtype: 'PaymentGrid',
-			kidId: record.id
-		}
-	}
-});
-
-vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
+vn.demand.scholarship.SponsorGrid_action = new Ext.ux.grid.RowActions({
 	fixed: true
 	,autoWidth: true
 	//,width: 100    
@@ -17,24 +8,24 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
     actions: [
 	{
         qtipIndex: _('Edit'),
-        iconCls: 'icon-edit-kid'
+        iconCls: 'icon-edit-sponsor'
     }, {
         qtipIndex: _('New Sponsor'),
         iconCls: 'icon-new-sponsor'
     }
 	],
     callbacks: {
-		'icon-edit-kid': function(grid, record, action, row, col){
+		'icon-edit-sponsor': function(grid, record, action, row, col){
 			// TODO: use Ext.Action to prevent duplicate these code and JobOrderTab.js 
 			new Ext.Window({
-                title: 'Edit kid',
+                title: 'Edit sponsor',
 				iconCls: 'icon-edit-report',
                 modal: true,
                 layout: 'fit',
                 width: 600,
                 height: 450,
                 items: {
-					kid: record,
+					sponsor: record,
                     xtype: 'KidForm'
                 }
             }).show();
@@ -48,7 +39,7 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
                 width: 600,
                 height: 450,
                 items: {
-					kid: record,
+					sponsor: record,
                     xtype: 'SponsorForm'
                 }
             }).show();
@@ -56,7 +47,7 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
 	}
 });
 
-vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
+vn.demand.scholarship.SponsorGrid = Ext.extend(Ext.grid.GridPanel, {
 
     // configurables
     border: true // {{{    
@@ -65,41 +56,23 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
         // hard coded - cannot be changed from outside
         var config = {
             // store
-            store: App.data.kidStore,
-            plugins: ['msgbus', vn.demand.scholarship.KidGrid_action, expander],//Ext.ux.PanelCollapsedTitle
-            columns: [expander, {
-                dataIndex: 'code',
-                header: _('Code')
+            store: App.data.sponsorStore,
+            plugins: ['msgbus', vn.demand.scholarship.SponsorGrid_action],//Ext.ux.PanelCollapsedTitle
+            columns: [{
+                dataIndex: 'phone',
+                header: _('Phone')
             }, {
                 dataIndex: 'name',
                 header: _('Name')
-            }, vn.demand.scholarship.KidGrid_action]
+            }, vn.demand.scholarship.SponsorGrid_action]
             ,
             viewConfig: {
                 forceFit: true
             } // tooltip template
-            ,tbar: [{
-				text: _('New Kid') ,
-				iconCls: 'icon-new-kid',
-				handler: function() {
-					new Ext.Window({
-                        title: 'New a Kid',
-                        iconCls: 'icon-prefs',
-                        modal: true,
-                        layout: 'fit',
-                        width: 500,
-                        height: 350,
-                        items: [{
-                            xtype: 'KidForm',
-							store: App.data.kidStore
-                        }]
-                    }).show();
-				}
-			}]
             ,
             bbar: new Ext.PagingToolbar({ // paging bar on the bottom
                 pageSize: 20,
-                store: App.data.kidStore,
+                store: App.data.sponsorStore,
                 displayInfo: true,
                 displayMsg: 'Displaying reports {0} - {1} of {2}',
                 emptyMsg: "No report to display"
@@ -108,7 +81,7 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
         // apply config
         Ext.apply(this, Ext.apply(this.initialConfig, config));
         // call parent
-        vn.demand.scholarship.KidGrid.superclass.initComponent.apply(this, arguments);
+        vn.demand.scholarship.SponsorGrid.superclass.initComponent.apply(this, arguments);
         
         
     } // eo function initComponent
@@ -116,12 +89,8 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
     onRender: function(){
     
         // call parent
-        vn.demand.scholarship.KidGrid.superclass.onRender.apply(this, arguments);
+        vn.demand.scholarship.SponsorGrid.superclass.onRender.apply(this, arguments);
         
-		this.subscribe('vn.demand.scholarships.run_report.result')
-		this.subscribe('vn.demand.scholarships.store.load_exception')
-		this.subscribe('vn.demand.scholarship.report_edit_done')
-		this.subscribe('vn.demand.scholarships.delete_report')
 		this.subscribe('vn.demand.scholarships.report_select')
 		
     } // eo function onRender
@@ -183,6 +152,6 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
 	}
 }); // eo extend
 // register xtype
-Ext.reg('KidGrid', vn.demand.scholarship.KidGrid);
+Ext.reg('SponsorGrid', vn.demand.scholarship.SponsorGrid);
 
 // eof

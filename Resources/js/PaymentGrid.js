@@ -1,15 +1,6 @@
 Ext.ns('vn.demand.scholarship');
 
-var expander = new Ext.ux.grid.RowPanelExpander({
-	createExpandingRowPanelItems: function(record, rowIndex){
-		return {
-			xtype: 'PaymentGrid',
-			kidId: record.id
-		}
-	}
-});
-
-vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
+vn.demand.scholarship.PaymentGrid_action = new Ext.ux.grid.RowActions({
 	fixed: true
 	,autoWidth: true
 	//,width: 100    
@@ -17,24 +8,24 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
     actions: [
 	{
         qtipIndex: _('Edit'),
-        iconCls: 'icon-edit-kid'
+        iconCls: 'icon-edit-payment'
     }, {
         qtipIndex: _('New Sponsor'),
         iconCls: 'icon-new-sponsor'
     }
 	],
     callbacks: {
-		'icon-edit-kid': function(grid, record, action, row, col){
+		'icon-edit-payment': function(grid, record, action, row, col){
 			// TODO: use Ext.Action to prevent duplicate these code and JobOrderTab.js 
 			new Ext.Window({
-                title: 'Edit kid',
+                title: 'Edit payment',
 				iconCls: 'icon-edit-report',
                 modal: true,
                 layout: 'fit',
                 width: 600,
                 height: 450,
                 items: {
-					kid: record,
+					payment: record,
                     xtype: 'KidForm'
                 }
             }).show();
@@ -48,7 +39,7 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
                 width: 600,
                 height: 450,
                 items: {
-					kid: record,
+					payment: record,
                     xtype: 'SponsorForm'
                 }
             }).show();
@@ -56,50 +47,50 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
 	}
 });
 
-vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
+vn.demand.scholarship.PaymentGrid = Ext.extend(Ext.grid.GridPanel, {
+	kidId: null,
 
     // configurables
     border: true // {{{    
     ,
     initComponent: function(){
         // hard coded - cannot be changed from outside
+		var store = new PaymentStore(App.data.conn)
         var config = {
             // store
-            store: App.data.kidStore,
-            plugins: ['msgbus', vn.demand.scholarship.KidGrid_action, expander],//Ext.ux.PanelCollapsedTitle
-            columns: [expander, {
-                dataIndex: 'code',
-                header: _('Code')
+            store: store,
+            plugins: ['msgbus', vn.demand.scholarship.PaymentGrid_action],//Ext.ux.PanelCollapsedTitle
+            columns: [{
+                dataIndex: 'sponsorId',
+                header: _('Sponsor'),
+				renderer: this.renderSponsor.createDelegate(this)
             }, {
-                dataIndex: 'name',
-                header: _('Name')
-            }, vn.demand.scholarship.KidGrid_action]
+                dataIndex: 'amount',
+                header: _('Amount')
+            }, {
+                dataIndex: 'date_start',
+                header: _('Start')
+            }, {
+                dataIndex: 'date_end',
+                header: _('End')
+            }, {
+                dataIndex: 'date_in',
+                header: _('Input')
+            }, {
+                dataIndex: 'extra_support',
+                header: _('Extra support')
+            }, {
+                dataIndex: 'note',
+                header: _('Note')
+            }, vn.demand.scholarship.PaymentGrid_action]
             ,
             viewConfig: {
                 forceFit: true
             } // tooltip template
-            ,tbar: [{
-				text: _('New Kid') ,
-				iconCls: 'icon-new-kid',
-				handler: function() {
-					new Ext.Window({
-                        title: 'New a Kid',
-                        iconCls: 'icon-prefs',
-                        modal: true,
-                        layout: 'fit',
-                        width: 500,
-                        height: 350,
-                        items: [{
-                            xtype: 'KidForm',
-							store: App.data.kidStore
-                        }]
-                    }).show();
-				}
-			}]
             ,
             bbar: new Ext.PagingToolbar({ // paging bar on the bottom
                 pageSize: 20,
-                store: App.data.kidStore,
+                store: store,
                 displayInfo: true,
                 displayMsg: 'Displaying reports {0} - {1} of {2}',
                 emptyMsg: "No report to display"
@@ -108,20 +99,24 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
         // apply config
         Ext.apply(this, Ext.apply(this.initialConfig, config));
         // call parent
-        vn.demand.scholarship.KidGrid.superclass.initComponent.apply(this, arguments);
+        vn.demand.scholarship.PaymentGrid.superclass.initComponent.apply(this, arguments);
         
         
     } // eo function initComponent
+    ,renderSponsor: function(val, cell, record) {
+		var sponsor = App.data.sponsorStore.getById(val);
+		return sponsor ? sponsor.get('name') : val;
+	}
     ,
     onRender: function(){
     
         // call parent
-        vn.demand.scholarship.KidGrid.superclass.onRender.apply(this, arguments);
-        
-		this.subscribe('vn.demand.scholarships.run_report.result')
-		this.subscribe('vn.demand.scholarships.store.load_exception')
-		this.subscribe('vn.demand.scholarship.report_edit_done')
-		this.subscribe('vn.demand.scholarships.delete_report')
+        vn.demand.scholarship.PaymentGrid.superclass.onRender.apply(this, arguments);
+        if (this.kidId) {
+			this.store.setBaseParam('where', "where kidId = '" + this.kidId + "'")
+		}
+		this.store.load()
+		
 		this.subscribe('vn.demand.scholarships.report_select')
 		
     } // eo function onRender
@@ -183,6 +178,6 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
 	}
 }); // eo extend
 // register xtype
-Ext.reg('KidGrid', vn.demand.scholarship.KidGrid);
+Ext.reg('PaymentGrid', vn.demand.scholarship.PaymentGrid);
 
 // eof
