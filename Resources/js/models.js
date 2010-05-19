@@ -114,6 +114,7 @@ Payment = Ext.data.Record.create([
     {name: 'kidId', type:'string'},
     {name: 'sponsorId', type:'string'},
     {name: 'extra_support', type:'string'},
+    {name: 'note', type:'string'},
     {name: 'amount', type:'integer'},
     {name: 'date_start', type:'date', dateFormat: 'Y-m-d H:i:s'},
     {name: 'date_end', type:'date', dateFormat: 'Y-m-d H:i:s'},

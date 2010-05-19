@@ -2,6 +2,7 @@ Ext.ns('vn.demand.scholarship');
 
 vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
 	// data
+	payment: null,
 	kid: null,
 	sponsor: null,
 	sponsorPayment: null,
@@ -66,11 +67,6 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
 					'select': function(cb, record, index) {
 						this.sponsor = record
 						this.getForm().loadRecord(record)
-					}
-					,'change': function(cb, newValue, oldValue) {
-						if (this.sponsor && newValue != oldValue) {
-							this.sponsor = null;
-						}
 					}
 					,scope: this
 				}
@@ -143,6 +139,15 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
         // set wait message target
         this.getForm().waitMsgTarget = this.getEl();
         
+		this.getForm().loadRecord(this.payment);
+		
+		var cb = this.getForm().findField('name');
+		var cbItem = cb.getStore().indexOfId(this.payment.get('sponsorId'));
+		var sponsor = cb.getStore().getById(this.payment.get('sponsorId'));
+		console.log('```````````````cbItem=' + cbItem)
+		cb.setValue(this.payment.get('sponsorId'));
+		cb.fireEvent('select', cb, sponsor, 0)
+		//cb.select(cbItem);
         // loads form after initial layout
         // this.on('afterlayout', this.onLoadClick, this, {single:true});
     
@@ -155,7 +160,14 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
     submit: function(){
 		var values = this.getForm().getValues();
 		try {
-			if (this.sponsor == null) {
+			var selectedSponsor = this.getForm().findField('name').getValue();
+			var isNewSponsor = true;
+			if (this.sponsor != null) {
+				isNewSponsor = selectedSponsor == values.name
+			}
+			console.log('``````````````isNewSponsor: ' + isNewSponsor)
+			
+			if (isNewSponsor) {
 				this.sponsor = {};
 				this.sponsor.sponsorId = Sponsor.nextId();
 				this.sponsor.name= values.name; 
@@ -176,30 +188,38 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
 			}
 			App.data.sponsorStore.load();
 			
-			this.payment = {
-				paymentId: Payment.nextId(), 
-				sponsorId: this.sponsor.id,
-				kidId: this.kid.get('kidId'),
-				amount: values.amount,
-				extra_support: values.extra_support,
-				note: values.note,
-				date_start: null,
-				date_end: null,
-				date_in: null
+			var isNewPayment = this.payment == null;
+			if (isNewPayment) {
+				this.payment = new Payment({
+					paymentId: isNewPayment ? Payment.nextId() : this.payment.paymentId,
+				});
 			}
+			this.payment.beginEdit();
+			this.payment.set('sponsorId', this.sponsor.id);
+			this.payment.set('kidId', this.kid.get('kidId'));
+			this.payment.set('amount', values.amount);
+			this.payment.set('extra_support', values.extra_support);
+			this.payment.set('note', values.note);
+			
 			var s = this.getForm().findField('date_start').getValue();
 			if (s && Ext.isDate(s)) {
-				this.payment.date_start = s.format('Y-m-d H:i:s');
+				this.payment.set('date_start', s);
 			}
 			s = this.getForm().findField('date_end').getValue();
 			if (s && Ext.isDate(s)) {
-				this.payment.date_end = s.format('Y-m-d H:i:s');
+				this.payment.set('date_end', s);
 			}
 			s = this.getForm().findField('date_in').getValue();
 			if (s && Ext.isDate(s)) {
-				this.payment.date_in = s.format('Y-m-d H:i:s');
+				this.payment.set('date_in', s);
 			}
-	        App.data.paymentStore.addPayment(this.payment)
+			if (isNewPayment) {
+		        App.data.paymentStore.insert(0, this.payment)
+				App.data.paymentStore.load();
+				this.payment = App.data.paymentStore.getById(this.payment.get('paymentId'));
+			} else {
+				this.payment.endEdit();
+			}
 		} catch (e) {
 			console.log(e);
 			Ext.Msg.alert(e)

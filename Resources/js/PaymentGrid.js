@@ -10,27 +10,12 @@ vn.demand.scholarship.PaymentGrid_action = new Ext.ux.grid.RowActions({
         qtipIndex: _('Edit'),
         iconCls: 'icon-edit-payment'
     }, {
-        qtipIndex: _('New Sponsor'),
-        iconCls: 'icon-new-sponsor'
+        qtipIndex: _('Delete'),
+        iconCls: 'icon-delete'
     }
 	],
     callbacks: {
 		'icon-edit-payment': function(grid, record, action, row, col){
-			// TODO: use Ext.Action to prevent duplicate these code and JobOrderTab.js 
-			new Ext.Window({
-                title: 'Edit payment',
-				iconCls: 'icon-edit-report',
-                modal: true,
-                layout: 'fit',
-                width: 600,
-                height: 450,
-                items: {
-					payment: record,
-                    xtype: 'KidForm'
-                }
-            }).show();
-		}, 
-		'icon-new-sponsor': function(grid, record, action, row, col){
 			new Ext.Window({
                 title: 'New sponsor for ' + record.get('name'),
 				iconCls: 'icon-new-sponsor',
@@ -39,10 +24,20 @@ vn.demand.scholarship.PaymentGrid_action = new Ext.ux.grid.RowActions({
                 width: 600,
                 height: 450,
                 items: {
+					kid: record,
 					payment: record,
                     xtype: 'SponsorForm'
                 }
             }).show();
+		}, 
+		'icon-delete': function(grid, record, action, row, col){
+			Ext.Msg.confirm(_('Delete payment'), "Do you want to delete this payment?", function(btn) {
+				var reportId = record.get('report_id'),
+					report_name = record.get('report_name')
+				if (btn == 'yes') {
+					grid.getStore().remove(record)
+				}
+			});
 		}
 	}
 });
@@ -69,13 +64,16 @@ vn.demand.scholarship.PaymentGrid = Ext.extend(Ext.grid.GridPanel, {
                 header: _('Amount')
             }, {
                 dataIndex: 'date_start',
-                header: _('Start')
+                header: _('Start'),
+				renderer: Ext.util.Format.dateRenderer('d/m/Y')
             }, {
                 dataIndex: 'date_end',
-                header: _('End')
+                header: _('End'),
+				renderer: Ext.util.Format.dateRenderer('d/m/Y')
             }, {
                 dataIndex: 'date_in',
-                header: _('Input')
+                header: _('Input'),
+				renderer: Ext.util.Format.dateRenderer('d/m/Y')
             }, {
                 dataIndex: 'extra_support',
                 header: _('Extra support')
@@ -85,15 +83,16 @@ vn.demand.scholarship.PaymentGrid = Ext.extend(Ext.grid.GridPanel, {
             }, vn.demand.scholarship.PaymentGrid_action]
             ,
             viewConfig: {
-                forceFit: true
-            } // tooltip template
+	            forceFit:true,
+	            emptyText: 'No Payments to display'
+	        }
             ,
             bbar: new Ext.PagingToolbar({ // paging bar on the bottom
                 pageSize: 20,
                 store: store,
                 displayInfo: true,
-                displayMsg: 'Displaying reports {0} - {1} of {2}',
-                emptyMsg: "No report to display"
+                displayMsg: 'Displaying payments {0} - {1} of {2}',
+                emptyMsg: "No payment to display"
             })// eo tbar,
         }; // eo config object
         // apply config
@@ -117,52 +116,12 @@ vn.demand.scholarship.PaymentGrid = Ext.extend(Ext.grid.GridPanel, {
 		}
 		this.store.load()
 		
-		this.subscribe('vn.demand.scholarships.report_select')
+		this.subscribe('vn.demand.scholarships.payment_select')
 		
     } // eo function onRender
     ,
 	onMessage: function(message, subject) {
-		if (message == 'vn.demand.scholarships.run_report.result') {
-			if (subject.success) {
-				var results = this.getStore().query('report_id', parseInt(subject.report_id));
-				if (results.getCount()) {
-					results.get(0).set('report_status', 1);
-					this.getStore().commitChanges();
-				}
-			}
-		}
-		else 
-			if (message == 'vn.demand.scholarships.store.load_exception') {
-				this.onLoadException();
-			}
-			else 
-				if (message == 'vn.demand.scholarship.report_edit_done') {
-					var report = subject.report
-					
-					var tab = Ext.getCmp('tabReport_' + report.report_id);
-					if (tab) {
-						tab.setTitle(report.report_name)
-					}
-					
-					//					var record = this.getStore().getById(report.report_id)
-					//					record.set('report_name', report.report_name)
-					//					record.commit();
-					this.getStore().load()
-				}
-				else 
-					if (message == 'vn.demand.scholarships.delete_report' && subject.success) {
-						var tab = Ext.getCmp('tabReport_' + subject.report_id);
-						var mainArea = Ext.getCmp('mainArea');
-						if (tab) {
-							mainArea.remove(tab.getId())
-						}
-						this.getStore().load()
-					} else if (message == 'vn.demand.scholarships.report_select') {
-						var index = this.getStore().indexOf(subject);
-						if (index > -1) {
-							this.fireEvent('rowclick', this, index);
-						}
-					}
+		
 	},
 	onLoadException: function() {
 		Ext.Msg.show({

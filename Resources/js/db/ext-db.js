@@ -118,8 +118,10 @@ Ext.data.SqlDB.Table.prototype = {
 	updateBy : function(o, clause, args, cb, scope){
 		var sql = "UPDATE " + this.name + " set ";
 		var fs = [], a = [];
+		console.log('============update=============')
 		for(var key in o){
 			if(o.hasOwnProperty(key)){
+				console.log(key + ": " + o[key]);
 				fs[fs.length] = key + ' = ?';
 				a[a.length] = o[key];
 			}
@@ -136,14 +138,17 @@ Ext.data.SqlDB.Table.prototype = {
 	insert : function(o, cb, scope){
 		var sql = "INSERT into " + this.name + " ";
 		var fs = [], vs = [], a = [];
+		console.log('====insert sql === ');
 		for(var key in o){
 			if(o.hasOwnProperty(key)){
+				console.log(key + ': ' + o[key]);
 				fs[fs.length] = key;
 				vs[vs.length] = '?';
 				a[a.length] = o[key];
 			}
 		}
 		sql = [sql, '(', fs.join(','), ') VALUES (', vs.join(','), ')'].join('');
+		console.log(sql)
         this.conn.execBy(sql, a, cb, scope);
     },
 

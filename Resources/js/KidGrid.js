@@ -1,14 +1,5 @@
 Ext.ns('vn.demand.scholarship');
 
-var expander = new Ext.ux.grid.RowPanelExpander({
-	createExpandingRowPanelItems: function(record, rowIndex){
-		return {
-			xtype: 'PaymentGrid',
-			kidId: record.id
-		}
-	}
-});
-
 vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
 	fixed: true
 	,autoWidth: true
@@ -21,6 +12,9 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
     }, {
         qtipIndex: _('New Sponsor'),
         iconCls: 'icon-new-sponsor'
+    }, {
+        qtipIndex: _('Payments'),
+        iconCls: 'icon-payments'
     }
 	],
     callbacks: {
@@ -53,6 +47,21 @@ vn.demand.scholarship.KidGrid_action = new Ext.ux.grid.RowActions({
                 }
             }).show();
 		}
+		,'icon-payments': function(grid, record, action, row, col){
+			new Ext.Window({
+                title: 'Payments for ' + record.get('name'),
+				iconCls: 'icon-payments',
+                modal: false,
+				maximizable: true,
+                layout: 'fit',
+                width: 600,
+                height: 450,
+                items: {
+					kidId: record.get('kidId'),
+                    xtype: 'PaymentGrid'
+                }
+            }).show();
+		}
 	}
 });
 
@@ -66,8 +75,8 @@ vn.demand.scholarship.KidGrid = Ext.extend(Ext.grid.GridPanel, {
         var config = {
             // store
             store: App.data.kidStore,
-            plugins: ['msgbus', vn.demand.scholarship.KidGrid_action, expander],//Ext.ux.PanelCollapsedTitle
-            columns: [expander, {
+            plugins: ['msgbus', vn.demand.scholarship.KidGrid_action],//Ext.ux.PanelCollapsedTitle
+            columns: [{
                 dataIndex: 'code',
                 header: _('Code')
             }, {

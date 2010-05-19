@@ -21,8 +21,8 @@
 .icon-ob {
 	background-image:url(../images/crystal/icons/ob_16.png) ! important;
 }
-.icon-report {
-	background-image:url(../images/crystal/icons/report.png) ! important;
+.icon-payments {
+	background-image:url(../images/crystal/icons/application_form.png) ! important;
 }
 .icon-graph {
 	background-image:url(../images/crystal/icons/chart_curve.png) ! important;
@@ -64,7 +64,7 @@
 .icon-new-kid {
 	background-image:url(../images/crystal/icons/add_report.png) ! important;
 }
-.icon-edit-kid {
+.icon-edit-payment {
 	background-image:url(../images/crystal/icons/edit_report.png) ! important;
 }
 .icon-del-field {
@@ -350,7 +350,7 @@
 	background-image:url(../ext/resources/images/default/s.gif) ! important;
 }
 .icon-delete {
-	background-image:url(../images/crystal/icons/bin_empty.png) ! important;
+	background-image:url(../images/crystal/icons/delete.png) ! important;
 }
 .icon-tree {
 	background-image:url(../images/crystal/icons/tree_16.png) ! important;
