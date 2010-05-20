@@ -57,14 +57,14 @@ vn.demand.scholarship.SponsorGrid = Ext.extend(Ext.grid.GridPanel, {
         var config = {
             // store
             store: App.data.sponsorStore,
-            plugins: ['msgbus', vn.demand.scholarship.SponsorGrid_action],//Ext.ux.PanelCollapsedTitle
+            plugins: ['msgbus'],//Ext.ux.PanelCollapsedTitle
             columns: [{
                 dataIndex: 'phone',
                 header: _('Phone')
             }, {
                 dataIndex: 'name',
                 header: _('Name')
-            }, vn.demand.scholarship.SponsorGrid_action]
+            }]
             ,
             viewConfig: {
                 forceFit: true

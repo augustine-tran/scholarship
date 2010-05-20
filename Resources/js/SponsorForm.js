@@ -139,14 +139,16 @@ vn.demand.scholarship.SponsorForm = Ext.extend(Ext.form.FormPanel, {
         // set wait message target
         this.getForm().waitMsgTarget = this.getEl();
         
-		this.getForm().loadRecord(this.payment);
+		if (this.payment) {
+			this.getForm().loadRecord(this.payment);
+			var cb = this.getForm().findField('name');
+			var cbItem = cb.getStore().indexOfId(this.payment.get('sponsorId'));
+			var sponsor = cb.getStore().getById(this.payment.get('sponsorId'));
+			console.log('```````````````cbItem=' + cbItem)
+			cb.setValue(this.payment.get('sponsorId'));
+			cb.fireEvent('select', cb, sponsor, 0)
+		}
 		
-		var cb = this.getForm().findField('name');
-		var cbItem = cb.getStore().indexOfId(this.payment.get('sponsorId'));
-		var sponsor = cb.getStore().getById(this.payment.get('sponsorId'));
-		console.log('```````````````cbItem=' + cbItem)
-		cb.setValue(this.payment.get('sponsorId'));
-		cb.fireEvent('select', cb, sponsor, 0)
 		//cb.select(cbItem);
         // loads form after initial layout
         // this.on('afterlayout', this.onLoadClick, this, {single:true});
